@@ -3,7 +3,8 @@ import { TextField, Button, Typography, Container, Box, Alert, CircularProgress 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'https://8001-i1csmgelwq595e3wt1acg-c7c750f2.manusvm.computer';
+const API_BASE_URL = 'const API_BASE_URL = 'https://global-clinic-backend-production.up.railway.app';
+';
 
 function Login() {
   const [mobileNumber, setMobileNumber] = useState('');

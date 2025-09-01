@@ -3,8 +3,8 @@ import { TextField, Button, Typography, Container, Box, Alert, CircularProgress 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'const API_BASE_URL = 'https://global-clinic-backend-production.up.railway.app';
-';
+// FIXED: Removed the duplicate variable assignment
+const API_BASE_URL = 'https://global-clinic-backend-production.up.railway.app';
 
 function Login() {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -121,5 +121,3 @@ function Login() {
 }
 
 export default Login;
-
-

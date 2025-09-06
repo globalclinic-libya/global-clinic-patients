@@ -31,7 +31,9 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
-          railway up
+          
+          # النشر المباشر باستخدام Railway Token
+          # Railway سيستخدم Project ID تلقائياً إذا كان المشروع مرتبطاً
+          railway up --project="421636c2-5b1e-4cdd-9394-6d693f68ebd9"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          

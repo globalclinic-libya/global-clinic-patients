@@ -32,8 +32,11 @@ jobs:
         run: |
           npm install -g @railway/cli
           
-          # النشر المباشر باستخدام Railway Token
-          # Railway سيستخدم Project ID تلقائياً إذا كان المشروع مرتبطاً
-          railway up --project="421636c2-5b1e-4cdd-9394-6d693f68ebd9"
+          # إنشاء ملف railway.toml مؤقت إذا لم يكن موجوداً
+          echo "[build]" > railway.toml
+          echo "command = \"echo Building\"" >> railway.toml
+          
+          # النشر
+          railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

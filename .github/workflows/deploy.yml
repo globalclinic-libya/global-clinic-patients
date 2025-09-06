@@ -32,10 +32,7 @@ jobs:
         run: |
           # تثبيت Railway CLI
           npm install -g @railway/cli
-          
-          # استخدم طريقة التسجيل الجديدة
-          echo "$RAILWAY_TOKEN" | railway login
-          
+             
           # النشر
           railway up
         env:

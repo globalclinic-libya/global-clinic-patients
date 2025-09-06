@@ -11,7 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
@@ -32,6 +31,19 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
+          #  Railway Token
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "ERROR: RAILWAY_TOKEN secret is not set"
+            exit 1
+          fi
+          
+          # login Railway
+          railway login --token "$RAILWAY_TOKEN"
+          
+          # insure the project is likned to railway
+          railway link || true
+          
+          # Deploy
           railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

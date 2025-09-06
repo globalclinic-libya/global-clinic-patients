@@ -31,14 +31,6 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
-          
-          # تحقق من وجود Railway Token
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "ERROR: RAILWAY_TOKEN secret is not set"
-            exit 1
-          fi
-          
-          # النشر مباشرة
           railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

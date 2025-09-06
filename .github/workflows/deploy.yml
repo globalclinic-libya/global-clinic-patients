@@ -31,12 +31,6 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
-          
-          # إنشاء ملف railway.toml مؤقت إذا لم يكن موجوداً
-          echo "[build]" > railway.toml
-          echo "command = \"echo Building\"" >> railway.toml
-          
-          # النشر
           railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

@@ -38,8 +38,7 @@ jobs:
             exit 1
           fi
           
-          # حاول النشر مع تجاهل أي مشاكل في الربط
-          echo "Attempting deployment to Railway..."
-          railway up --verbose
+          # النشر مباشرة
+          railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

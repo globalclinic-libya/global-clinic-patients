@@ -1,16 +1,35 @@
 # المرحلة 1: بناء التطبيق باستخدام pnpm
 FROM node:20-alpine AS builder
+
+# عرّف متغيرات البيئة من Railway (اختيارية، لكن مفيدة للتصحيح)
+ARG RAILWAY_SERVICE_NAME
+ARG RAILWAY_ENVIRONMENT
+
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm@8 && pnpm install --frozen-lockfile
+
+# سجل معلومات البناء
+RUN echo "🏗️ Building $RAILWAY_SERVICE_NAME in $RAILWAY_ENVIRONMENT environment"
+
+# انسخ ملف القفل أولاً
+COPY pnpm-lock.yaml ./
+
+# استخدم cache mount لتسريع التثبيت
+RUN --mount=type=cache,id=s/4f4b8ecf-8b2a-40c5-b28f-51e93180ef5b-pnpm,target=/root/.pnpm-store \
+    npm install -g pnpm@8 && \
+    pnpm install --frozen-lockfile
+
+# انسخ باقي الكود
 COPY . .
+
+# بناء المشروع
 RUN pnpm run build
+
 
 # المرحلة 2: خدمة الملفات الثابتة عبر nginx
 FROM nginx:alpine
 
-# تثبيت bash و util-linux (لوجود envsubst)
-RUN apk add --no-cache bash curl
+# تثبيت bash لتمكين تنفيذ أوامر shell
+RUN apk add --no-cache bash
 
 # انسخ الملفات المبنية إلى مجلد nginx
 COPY --from=builder /app/dist /usr/share/nginx/html

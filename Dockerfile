@@ -16,7 +16,7 @@ COPY package.json pnpm-lock.yaml ./
 # استخدم cache عام لـ pnpm (بدون بادئة s/)
 RUN --mount=type=cache,id=s/4f4b8ecf-8b2a-40c5-b28f-51e93180ef5b-pnpm-store,target=/root/.pnpm-store \
     npm install -g pnpm@8 && \
-    pnpm install --frozen-lockfile
+    pnpm install --force
 
 # انسخ باقي الكود
 COPY . .

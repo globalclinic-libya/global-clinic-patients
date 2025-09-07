@@ -1,0 +1,4 @@
+# nixpacks.toml
+[build]
+useDockerfile = true
+dockerfile = "Dockerfile"

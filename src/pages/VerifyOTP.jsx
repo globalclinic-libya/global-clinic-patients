@@ -53,17 +53,17 @@ function VerifyOTP() {
     setLoading(true);
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/verify`, {
+      const _response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/verify`, {
         mobile_number: mobileNumber,
         otp_code: otp,
-      });
+      }); 
       
-      console.log('Verification Response:', response.data);
+      console.log('Verification Response:', _response.data);
       
       // Store the JWT token in localStorage
-      if (response.data.access_token) {
-        localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('user_id', response.data.user_id);
+      if (_response.data.access_token) {
+        localStorage.setItem('access_token', _response.data.access_token);
+        localStorage.setItem('user_id', _response.data.user_id);
         localStorage.setItem('user_role', 'patient');
       }
       
@@ -73,9 +73,9 @@ function VerifyOTP() {
     } catch (error) {
       console.error('Verification error:', error);
       
-      if (error.response) {
-        const errorMessage = error.response.data.detail || 'حدث خطأ في الخادم';
-        if (error.response.status === 400) {
+      if (error._response) {
+        const errorMessage = error._response.data.detail || 'حدث خطأ في الخادم';
+        if (error._response.status === 400) {
           if (errorMessage.includes('expired')) {
             setError('انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.');
           } else if (errorMessage.includes('Invalid OTP')) {
@@ -101,9 +101,9 @@ function VerifyOTP() {
     setLoading(true);
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/start`, {
+      const _response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/start`, {
         mobile_number: mobileNumber,
-      });
+      }); 
       
       setCountdown(300); // Reset countdown
       alert('تم إرسال رمز تحقق جديد إلى هاتفك');

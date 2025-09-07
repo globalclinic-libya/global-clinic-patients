@@ -1,7 +1,9 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+// eslint.config.js
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import vitest from '@vitest/eslint-plugin'; // ← أضف plugin vitest
 
 export default [
   { ignores: ['dist'] },
@@ -9,7 +11,11 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...vitest.environments.env.globals, // ← أضف بيئات vitest
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -19,6 +25,7 @@ export default [
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'vitest': vitest, // ← سجّل plugin vitest
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -28,6 +35,7 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      // يمكنك إزالة 'no-undef' أو تركها، لأن vitest يعرّف المتغيرات
     },
   },
-]
+];

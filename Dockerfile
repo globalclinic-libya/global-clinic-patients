@@ -36,5 +36,14 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # انسخ ملف nginx كقالب
 COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 
+# أضف start.sh إلى الحاوية
+COPY start.sh /start.sh
+
+# اجعل start.sh قابلاً للتنفيذ (اختياري، لكن موصى به)
+RUN chmod +x /start.sh
+
+# ابدأ الخدمة باستخدام start.sh
+CMD ["/start.sh"]
+
 # قم بتعديل ملف الإعدادات باستخدام PORT عند التشغيل 
 CMD sh -c 'envsubst "${PORT}" < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'

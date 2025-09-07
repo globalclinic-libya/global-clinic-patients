@@ -36,6 +36,5 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # انسخ ملف nginx كقالب
 COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 
-# قم بتعديل ملف الإعدادات باستخدام PORT عند التشغيل
-CMD envsubst '${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && \
-    nginx -g 'daemon off;'
+# قم بتعديل ملف الإعدادات باستخدام PORT عند التشغيل 
+CMD sh -c 'envsubst "${PORT}" < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'

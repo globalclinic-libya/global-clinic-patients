@@ -8,13 +8,13 @@ ARG RAILWAY_ENVIRONMENT
 WORKDIR /app
 
 # سجل معلومات البناء
-RUN echo "Building $RAILWAY_SERVICE_NAME in $RAILWAY_ENVIRONMENT environment"
+RUN echo "🏗️ Building $RAILWAY_SERVICE_NAME in $RAILWAY_ENVIRONMENT environment"
 
 # انسخ package.json و pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
-# استخدم cache عام لـ pnpm
-RUN --mount=type=cache,id=s/pnpm-store,target=/root/.pnpm-store \
+# استخدم cache عام لـ pnpm (بدون بادئة s/)
+RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     npm install -g pnpm@8 && \
     pnpm install --frozen-lockfile
 
@@ -27,10 +27,10 @@ RUN pnpm run build
 # المرحلة 2: خدمة الملفات الثابتة عبر nginx
 FROM nginx:alpine
 
-# تثبيت bash لتمكين تنفيذ أوامر shell
+# تثبيت bash
 RUN apk add --no-cache bash
 
-# انسخ الملفات المبنية إلى مجلد nginx
+# انسخ الملفات المبنية
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # انسخ ملف nginx كقالب

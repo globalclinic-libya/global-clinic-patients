@@ -1,11 +1,11 @@
-name: Deploy to Railway
+name: Build Only
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,10 +27,3 @@ jobs:
 
       - name: Build project
         run: pnpm run build
-
-      - name: Deploy to Railway
-        run: |
-          npm install -g @railway/cli
-          railway up
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

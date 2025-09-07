@@ -8,14 +8,13 @@ ARG RAILWAY_ENVIRONMENT
 WORKDIR /app
 
 # سجل معلومات البناء
-RUN echo "🏗️ Building $RAILWAY_SERVICE_NAME in $RAILWAY_ENVIRONMENT environment"
+RUN echo "Building $RAILWAY_SERVICE_NAME in $RAILWAY_ENVIRONMENT environment"
 
 # انسخ package.json و pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
 # استخدم cache عام لـ pnpm
-RUN --mount=type=cache,id=s/4f4b8ecf-8b2a-40c5-b28f-51e93180ef5b-pnpm,target=/root/.pnpm-store \
-# RUN --mount=type=cache,id=s/pnpm-store,target=/root/.pnpm-store \
+RUN --mount=type=cache,id=s/pnpm-store,target=/root/.pnpm-store \
     npm install -g pnpm@8 && \
     pnpm install --frozen-lockfile
 

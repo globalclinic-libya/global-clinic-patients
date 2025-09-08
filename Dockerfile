@@ -28,7 +28,7 @@ RUN pnpm run build
 FROM nginx:alpine
 
 # تثبيت bash
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash gettext
 
 # انسخ الملفات المبنية
 COPY --from=builder /app/dist /usr/share/nginx/html

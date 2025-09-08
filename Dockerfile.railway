@@ -1,0 +1,30 @@
+# المرحلة 1: بناء التطبيق باستخدام pnpm
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# انسخ package.json و pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
+
+# استخدم cache عام لـ pnpm (بدون بادئة s/)
+RUN  npm install -g pnpm@10 && \
+     pnpm install --no-frozen-lockfile
+
+# انسخ باقي الكود
+COPY . .
+
+# بناء المشروع
+RUN pnpm run build
+
+# المرحلة 2: خدمة الملفات الثابتة عبر nginx
+FROM nginx:alpine
+
+
+# انسخ الملفات المبنية
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]

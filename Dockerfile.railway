@@ -1,29 +1,26 @@
-# المرحلة 1: بناء التطبيق باستخدام pnpm
+# Dockerfile.railway
 FROM node:20-alpine AS builder
 
 WORKDIR /app
-
-# انسخ package.json و pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
-
-# استخدم cache عام لـ pnpm (بدون بادئة s/)
-RUN  npm install -g pnpm@10 && \
-     pnpm install --no-frozen-lockfile
-
-# انسخ باقي الكود
+COPY package*.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --no-frozen-lockfile
 COPY . .
-
-# بناء المشروع
 RUN pnpm run build
 
-# المرحلة 2: خدمة الملفات الثابتة عبر nginx
+# المرحلة الثانية: nginx بدون proxy_pass
 FROM nginx:alpine
 
-# انسخ الملفات المبنية (محتوى dist فقط)
-COPY --from=builder /app/dist/. /usr/share/nginx/html
-# انسخ ملف nginx
+# إزالة الإعدادات الافتراضية
+RUN rm -rf /etc/nginx/conf.d/*
+
+# نسخ الملفات الثابتة
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# نسخ ملف التكوين الخاص بك (بدون proxy)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# فتح المنفذ 80
 EXPOSE 80
 
+# تشغيل nginx
 CMD ["nginx", "-g", "daemon off;"]

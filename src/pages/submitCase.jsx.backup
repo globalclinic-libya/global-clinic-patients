@@ -8,7 +8,7 @@ import { ArrowBack, CloudUpload } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:5000';
 
 function SubmitCase() {
   const [medicalHistory, setMedicalHistory] = useState('');
@@ -64,73 +64,74 @@ function SubmitCase() {
   };
 
   const handleSubmit = async (event) => {
-   event.preventDefault();
-   setError('');
- 
-   if (!medicalHistory.trim()) {
-     setError('يرجى إدخال التاريخ الطبي');
-     return;
-   }
- 
-   const validationErrors = validateFiles();
-   if (validationErrors.length > 0) {
-     setError(validationErrors.join('. '));
-     return;
-   }
- 
-   setLoading(true);
-   setUploadProgress(0);
- 
-   const formData = new FormData();
-   formData.append('description', medicalHistory);
-   if (audioFile) {
-     formData.append('audio_file', audioFile);
-   }
-   documentFiles.forEach(file => {
-     formData.append('document_files', file);
-   });
- 
-   try {
-     const token = localStorage.getItem('access_token');
-     if (!token) {
-       setError('انتهت جلسة تسجيل الدخول.');
-       setTimeout(() => navigate('/'), 2000);
-       return;
-     }
- 
-     const response = await axios.post(`${API_BASE_URL}/api/patients/cases`, formData, {
-       headers: {
-         'Content-Type': 'multipart/form-data',
-         Authorization: `Bearer ${token}`,
-       },
-       onUploadProgress: (progressEvent) => {
-         const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-         setUploadProgress(progress);
-       },
-     });
- 
-     console.log('Case submitted:', response.data);
-     
-     alert('تم تقديم حالتك الطبية بنجاح!');
-     navigate('/dashboard');
-     window.location.reload();
-   } catch (error) {
-     console.error('Submit case error:', error);
-     
-     if (error.response?.status === 401) {
-       localStorage.removeItem('access_token');
-       setError('انتهت الجلسة. سيتم إعادة التوجيه...');
-       setTimeout(() => navigate('/'), 2000);
-     } else if (error.response?.data?.message) {
-       setError(error.response.data.message);
-     } else {
-       setError('فشل في تقديم الحالة. تحقق من اتصال الإنترنت.');
-     }
-  } finally {
-    setLoading(false);
+    event.preventDefault();
+    setError('');
+    
+    if (!medicalHistory.trim()) {
+      setError('يرجى إدخال التاريخ الطبي');
+      return;
+    }
+    
+    const validationErrors = validateFiles();
+    if (validationErrors.length > 0) {
+      setError(validationErrors.join('. '));
+      return;
+    }
+
+    setLoading(true);
     setUploadProgress(0);
-  }
-};
+
+    const formData = new FormData();
+    formData.append('description', medicalHistory);
+    formData.append('audio_file', audioFile);
+    
+    documentFiles.forEach((file) => {
+      formData.append('document_files', file);
+    });
+
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        setError('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
+        setTimeout(() => navigate('/'), 2000);
+        return;
+      }
+
+      const response = await axios.post(`${API_BASE_URL}/api/patients/cases`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+        },
+      });
+      
+      console.log('Case submitted:', response.data);
+      
+      // Show success message and navigate
+      alert('تم تقديم حالتك الطبية بنجاح! سيتم مراجعتها من قبل أطباء متخصصين وستحصل على التقرير قريباً.');
+      navigate('/dashboard'); // navigate('/dashboard', { state: { refresh: true } }); <-- replace after finish system
+      window.location.reload(); 
+
+    } catch (error) {
+      console.error('Submit case error:', error);
+      
+      if (error.response?.status === 401) {
+        localStorage.removeItem('access_token');
+        setError('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.');
+        setTimeout(() => navigate('/'), 2000);
+      } else if (error.response?.data?.detail) {
+        setError(error.response.data.detail);
+      } else {
+        setError('فشل في تقديم الحالة. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
+    }
+  };
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -196,46 +197,42 @@ function SubmitCase() {
               helperText="كلما كانت المعلومات أكثر تفصيلاً، كان التشخيص أدق"
             />
 
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel htmlFor="audio-upload">التسجيل الصوتي *</InputLabel>
+              <Input
+                id="audio-upload"
+                type="file"
+                accept=".mp3,.wav,.m4a,.aac"
+                onChange={handleAudioChange}
+                disabled={loading}
+                inputProps={{ 'aria-describedby': 'audio-helper-text' }}
+              />
+              <FormHelperText id="audio-helper-text">
+                {audioFile 
+                  ? `تم اختيار: ${audioFile.name} (${formatFileSize(audioFile.size)})`
+                  : 'يرجى تسجيل وصف صوتي لحالتك الطبية (MP3, WAV, M4A, AAC - حد أقصى 50 ميجابايت)'
+                }
+              </FormHelperText>
+            </FormControl>
 
-	  {/* Audio Upload Field */}
-           <FormControl fullWidth margin="normal">
-             <InputLabel htmlFor="audio-upload">التسجيل الصوتي (اختياري)</InputLabel>
-             <Input
-               id="audio-upload"
-               type="file"
-               accept=".mp3,.wav,.m4a,.aac"
-               onChange={handleAudioChange}
-               disabled={loading}
-               inputProps={{ 'aria-describedby': 'audio-helper-text' }}
-             />
-             <FormHelperText id="audio-helper-text">
-               {audioFile
-                 ? `تم اختيار: ${audioFile.name} (${formatFileSize(audioFile.size)})`
-                 : 'اختر ملف صوتي لوصف حالتك (MP3, WAV, M4A, AAC - حتى 50 ميجابايت)'
-               }
-             </FormHelperText>
-           </FormControl>
-           
-           {/* Document Upload Field */}
-           <FormControl fullWidth margin="normal">
-             <InputLabel htmlFor="document-upload">المستندات الطبية (اختياري)</InputLabel>
-             <Input
-               id="document-upload"
-               type="file"
-               multiple
-               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-               onChange={handleDocumentChange}
-               disabled={loading}
-               inputProps={{ 'aria-describedby': 'document-helper-text' }}
-             />
-             <FormHelperText id="document-helper-text">
-               {documentFiles.length > 0
-                 ? `تم اختيار ${documentFiles.length} ملف: ${documentFiles.map(f => f.name).join(', ')}`
-                 : 'ارفع تقارير طبية، أشعة، تحاليل (PDF, JPG, PNG, DOC - حتى 50 ميجابايت لكل ملف)'
-               }
-             </FormHelperText>
-           </FormControl>
-
+            <FormControl fullWidth margin="normal">
+              <InputLabel htmlFor="document-upload">المستندات الطبية (اختياري)</InputLabel>
+              <Input
+                id="document-upload"
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                onChange={handleDocumentChange}
+                disabled={loading}
+                inputProps={{ 'aria-describedby': 'document-helper-text' }}
+              />
+              <FormHelperText id="document-helper-text">
+                {documentFiles.length > 0 
+                  ? `تم اختيار ${documentFiles.length} ملف: ${documentFiles.map(f => f.name).join(', ')}`
+                  : 'تقارير طبية، أشعة، تحاليل (PDF, JPG, PNG, DOC - حد أقصى 50 ميجابايت لكل ملف)'
+                }
+              </FormHelperText>
+            </FormControl>
 
             <Button
               type="submit"

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box, Alert, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../App';
 
-const API_BASE_URL = 'https://8001-i1csmgelwq595e3wt1acg-c7c750f2.manusvm.computer';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function VerifyOTP() {
   const [otp, setOtp] = useState('');
@@ -12,6 +13,7 @@ function VerifyOTP() {
   const [countdown, setCountdown] = useState(300); // 5 minutes countdown
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth(); 
   const mobileNumber = location.state?.mobileNumber;
   const debugOtp = location.state?.debugOtp; // For development only
 
@@ -53,29 +55,31 @@ function VerifyOTP() {
     setLoading(true);
     
     try {
-      const _response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/verify`, {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
         mobile_number: mobileNumber,
-        otp_code: otp,
+        otp: otp, 
       }); 
       
-      console.log('Verification Response:', _response.data);
+      console.log('Verification Response:', response.data);
       
       // Store the JWT token in localStorage
-      if (_response.data.access_token) {
-        localStorage.setItem('access_token', _response.data.access_token);
-        localStorage.setItem('user_id', _response.data.user_id);
-        localStorage.setItem('user_role', 'patient');
-      }
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
-      
+     // استخدام دالة login من AuthContext لتحديث الحالة
+       if (response.data.access_token) {
+         login({
+           access_token: response.data.access_token,
+           user_id: response.data.user_id,
+           role: 'patient'
+      });
+    }
+
+       console.log("Navigating to dashboard...");
+       navigate('/dashboard');
     } catch (error) {
       console.error('Verification error:', error);
       
-      if (error._response) {
-        const errorMessage = error._response.data.detail || 'حدث خطأ في الخادم';
-        if (error._response.status === 400) {
+      if (error.response) {
+        const errorMessage = error.response.data.detail || 'حدث خطأ في الخادم';
+        if (error.response.status === 400) {
           if (errorMessage.includes('expired')) {
             setError('انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.');
           } else if (errorMessage.includes('Invalid OTP')) {
@@ -101,7 +105,7 @@ function VerifyOTP() {
     setLoading(true);
     
     try {
-      const _response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/start`, {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register/api/patient/start`, {
         mobile_number: mobileNumber,
       }); 
       

@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import VerifyOTP from './pages/VerifyOTP';
 import Dashboard from './pages/Dashboard';
 import SubmitCase from './pages/SubmitCase';
+import CaseDetail from './pages/CaseDetail.jsx';
+import ReportView from './pages/ReportView';
 import './App.css';
 
 // Create Arabic RTL theme
@@ -178,7 +180,22 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            
+            <Route 
+	      path="/case/:caseId" 
+	      element={
+	        <ProtectedRoute>
+		 <CaseDetail />
+	        </ProtectedRoute>
+	      } 
+	     />
+             <Route 
+               path="/case/:caseId/report" 
+               element={
+                 <ProtectedRoute>
+                   <ReportView />
+                 </ProtectedRoute>
+               } 
+             />
             {/* Catch all route - redirect to appropriate page */}
             <Route 
               path="*" 

@@ -7,7 +7,7 @@ import { Add as AddIcon, ExitToApp as LogoutIcon, Refresh as RefreshIcon } from 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = 'https://8001-i1csmgelwq595e3wt1acg-c7c750f2.manusvm.computer';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Dashboard() {
   const [cases, setCases] = useState([]);
@@ -49,13 +49,13 @@ function Dashboard() {
         return;
       }
 
-      const response = await axios.get(`${API_BASE_URL}/api/patient/cases`, {
+      const response = await axios.get(`${API_BASE_URL}/api/patients/cases`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       
-      setCases(response.data);
+      setCases(response.data.cases || []);
     } catch (error) {
       console.error('Error fetching cases:', error);
       

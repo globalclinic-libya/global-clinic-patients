@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 // FIXED: Removed the duplicate variable assignment
-const API_BASE_URL = 'https://global-clinic-backend-production.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Login() {
   const [mobileNumber, setMobileNumber] = useState('');

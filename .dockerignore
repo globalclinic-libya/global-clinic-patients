@@ -9,8 +9,6 @@ yarn-debug.log
 package-lock.json
 yarn.lock
 
-# لا تتجاهل pnpm-lock.yaml
-# pnpm-lock.yaml ← احذف هذا السطر
 
 # ========================
 # Build & Output
